@@ -6,7 +6,7 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
+
 
 @Entity
 @Table(name = "tasks")
@@ -24,15 +24,15 @@ public class TaskEntity {
     private String description;
 
     @ManyToOne
-    @JoinColumn( name - "creator_id", nullable = false)
+    @JoinColumn( name = "creator_id", nullable = false)
     private UserEntity creator;
 
     @ManyToOne
-    @JoinColumn( name - "assignee_id")
+    @JoinColumn( name = "assignee_id")
     private UserEntity assignee;
 
     @ManyToOne
-    @JoinColumn( name - "schedule_id")
+    @JoinColumn( name = "schedule_id")
     private ScheduleEntity schedule;
 
     @OneToOne(cascade = CascadeType.ALL)
@@ -43,7 +43,7 @@ public class TaskEntity {
     private List<SubtaskEntity> subtasks;
 
     @OneToMany (mappedBy = "task", cascade = CascadeType.ALL)
-    private List<File> files;
+    private List<FileEntity> files;
 
 
 
