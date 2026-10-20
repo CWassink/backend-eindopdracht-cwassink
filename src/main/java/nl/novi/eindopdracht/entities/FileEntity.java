@@ -23,8 +23,12 @@ public class FileEntity {
     @Column(nullable = false)
     private String fileUrl;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "task_id", nullable = false)
     private TaskEntity task;
+
+    @OneToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private UserEntity user;
 
 }

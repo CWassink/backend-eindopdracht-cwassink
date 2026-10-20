@@ -7,6 +7,7 @@ import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import nl.novi.eindopdracht.enums.DayPart;
 
 
 @Entity
@@ -23,6 +24,13 @@ public class TaskEntity {
     private String title;
     private String description;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private DayPart dayPart;
+
+    @Column(nullable = false)
+    private int sortOrder;
+
     @ManyToOne
     @JoinColumn( name = "schedule_id", nullable = false)
     private ScheduleEntity schedule;
@@ -34,11 +42,8 @@ public class TaskEntity {
     @OneToMany (mappedBy = "task", cascade = CascadeType.ALL)
     private List<SubtaskEntity> subtasks = new ArrayList<>();
 
-    @OneToMany (mappedBy = "task", cascade = CascadeType.ALL)
-    private List<FileEntity> files = new ArrayList<>();
-
-
-
+    @OneToOne (mappedBy = "task", cascade = CascadeType.ALL)
+    private FileEntity file;
 
 
 
