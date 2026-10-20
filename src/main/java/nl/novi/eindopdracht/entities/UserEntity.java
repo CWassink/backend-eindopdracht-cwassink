@@ -4,8 +4,10 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import javax.management.relation.Role;
+
+import java.util.ArrayList;
 import java.util.List;
+import nl.novi.eindopdracht.enums.Role;
 
 @Entity
 @Table (name = "users")
@@ -18,24 +20,29 @@ public class UserEntity {
     private Long id;
 
     @Column(unique = true,nullable = false)
-    private String email;
+    private String username;
 
     @Column(nullable = false)
     private String password;
 
     private String name;
 
-    @ManyToOne
-    @JoinColumn(name = "role_id", nullable = false)
-    private Role role;
-    //als Role een Enum mag worden bovenstaande @ManyToOne verwijderen en vervangen door onderstaande code
-    //@Enumerated (EnumType.STRING)
-    //@cColumn(nullable = false)
-    //private Role role;
 
+//    Role als enum, wacht op akkoord van school
+    @Enumerated (EnumType.STRING)
+    @Column(nullable = false)
+    private Role role;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn( name = "caregiver_id")
+    private UserEntity caregiver;
 
     @OneToMany (mappedBy = "user")
-    private List<ScheduleEntity> schedules;
+    private List<ScheduleEntity> schedules = new ArrayList<>();
 
+    @OneToMany (mappedBy = "caregiver")
+    private List<UserEntity> clients = new ArrayList<>();
 
+    @OneToOne (mappedBy = "user", cascade = CascadeType.ALL)
+    private FileEntity profilePhoto;
 }

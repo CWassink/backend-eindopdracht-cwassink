@@ -43,7 +43,7 @@ public class TaskEntity {
     private List<SubtaskEntity> subtasks = new ArrayList<>();
 
     @OneToOne (mappedBy = "task", cascade = CascadeType.ALL)
-    private FileEntity file;
+    private FileEntity pictogram;
 
 
 

@@ -12,7 +12,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class FileEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -23,12 +22,15 @@ public class FileEntity {
     @Column(nullable = false)
     private String fileUrl;
 
+    @Column(nullable = false)
+    private String contentType;
+
     @OneToOne
-    @JoinColumn(name = "task_id", nullable = false)
+    @JoinColumn(name = "task_id")
     private TaskEntity task;
 
     @OneToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id")
     private UserEntity user;
 
 }
