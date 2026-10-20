@@ -24,15 +24,7 @@ public class TaskEntity {
     private String description;
 
     @ManyToOne
-    @JoinColumn( name = "creator_id", nullable = false)
-    private UserEntity creator;
-
-    @ManyToOne
-    @JoinColumn( name = "assignee_id")
-    private UserEntity assignee;
-
-    @ManyToOne
-    @JoinColumn( name = "schedule_id")
+    @JoinColumn( name = "schedule_id", nullable = false)
     private ScheduleEntity schedule;
 
     @OneToOne(cascade = CascadeType.ALL)

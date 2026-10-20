@@ -35,11 +35,6 @@ public class UserEntity {
     //@cColumn(nullable = false)
     //private Role role;
 
-    @OneToMany(mappedBy = "creator")
-    private List<TaskEntity> createdTasks;
-
-    @OneToMany (mappedBy = "assignee")
-    private List<TaskEntity> assignedTasks;
 
     @OneToMany (mappedBy = "user")
     private List<ScheduleEntity> schedules;

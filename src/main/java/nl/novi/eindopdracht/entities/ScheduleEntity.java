@@ -1,20 +1,19 @@
 package nl.novi.eindopdracht.entities;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "schedules")
-@Data
 @NoArgsConstructor
-@AllArgsConstructor
-
+@Getter
+@Setter
 public class ScheduleEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,14 +23,14 @@ public class ScheduleEntity {
     private String name;
 
     @Column(nullable = false)
-    LocalDate date;
+    private LocalDate date;
 
     @ManyToOne
     @JoinColumn(name = "user_id",nullable = false)
     private UserEntity user;
 
     @OneToMany(mappedBy = "schedule")
-    private List<TaskEntity> tasks;
+    private List<TaskEntity> tasks = new ArrayList<>();
 
 
 }
