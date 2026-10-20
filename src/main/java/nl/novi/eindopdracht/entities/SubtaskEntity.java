@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import nl.novi.eindopdracht.enums.DayPart;
+import nl.novi.eindopdracht.enums.ProgressStatus;
 
 
 @Entity
@@ -20,7 +22,7 @@ public class SubtaskEntity {
     private String title;
 
     @Column(nullable = false)
-    private boolean isCompleted = false;
+    private boolean completed = false;
 
     @Column(nullable = false)
     private int sortOrder;
