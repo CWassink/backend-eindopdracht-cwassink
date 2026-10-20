@@ -1,19 +1,19 @@
 package nl.novi.eindopdracht.entities;
 
 import jakarta.persistence.*;
-import java.util.List;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import java.util.ArrayList;
+import java.util.List;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 
 @Entity
 @Table(name = "tasks")
-@Data
 @NoArgsConstructor
-@AllArgsConstructor
-
+@Getter
+@Setter
 public class TaskEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,10 +32,10 @@ public class TaskEntity {
     private ProgressEntity progress;
 
     @OneToMany (mappedBy = "task", cascade = CascadeType.ALL)
-    private List<SubtaskEntity> subtasks;
+    private List<SubtaskEntity> subtasks = new ArrayList<>();
 
     @OneToMany (mappedBy = "task", cascade = CascadeType.ALL)
-    private List<FileEntity> files;
+    private List<FileEntity> files = new ArrayList<>();
 
 
 

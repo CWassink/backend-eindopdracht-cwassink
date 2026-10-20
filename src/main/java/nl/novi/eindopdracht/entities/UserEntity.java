@@ -1,19 +1,17 @@
 package nl.novi.eindopdracht.entities;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
-
+import lombok.Setter;
 import javax.management.relation.Role;
 import java.util.List;
 
 @Entity
 @Table (name = "users")
-@Data
 @NoArgsConstructor
-@AllArgsConstructor
-
+@Getter
+@Setter
 public class UserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

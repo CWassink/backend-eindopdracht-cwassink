@@ -1,16 +1,16 @@
 package nl.novi.eindopdracht.entities;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
+import lombok.Setter;
+
 
 @Entity
 @Table(name = "subtasks")
-@Data
 @NoArgsConstructor
-@AllArgsConstructor
-
+@Getter
+@Setter
 public class SubtaskEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,6 +21,9 @@ public class SubtaskEntity {
 
     @Column(nullable = false)
     private boolean isCompleted = false;
+
+    @Column(nullable = false)
+    private int sortOrder;
 
     @ManyToOne
     @JoinColumn(name = "task_id", nullable = false)

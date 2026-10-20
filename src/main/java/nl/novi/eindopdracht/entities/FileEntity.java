@@ -1,16 +1,16 @@
 package nl.novi.eindopdracht.entities;
 
 import jakarta.persistence.*;
-import lombok.Data;
+
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "files")
-@Data
 @NoArgsConstructor
-@AllArgsConstructor
-
+@Getter
+@Setter
 public class FileEntity {
 
     @Id
