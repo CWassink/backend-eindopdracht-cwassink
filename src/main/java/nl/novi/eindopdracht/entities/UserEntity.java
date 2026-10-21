@@ -28,7 +28,7 @@ public class UserEntity {
     private String name;
 
 
-//    Role als enum, wacht op akkoord van school
+
     @Enumerated (EnumType.STRING)
     @Column(nullable = false)
     private Role role;
@@ -43,6 +43,5 @@ public class UserEntity {
     @OneToMany (mappedBy = "caregiver")
     private List<UserEntity> clients = new ArrayList<>();
 
-    @OneToOne (mappedBy = "user", cascade = CascadeType.ALL)
-    private FileEntity profilePhoto;
+
 }

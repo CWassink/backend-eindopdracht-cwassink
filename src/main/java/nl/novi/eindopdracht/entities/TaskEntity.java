@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import nl.novi.eindopdracht.enums.DayPart;
+import org.springframework.core.annotation.Order;
 
 
 @Entity
@@ -41,6 +42,7 @@ public class TaskEntity {
     @JoinColumn(name = "progress_id")
     private ProgressEntity progress;
 
+    @OrderBy("sortOrder")
     @OneToMany (mappedBy = "task", cascade = CascadeType.ALL)
     private List<SubtaskEntity> subtasks = new ArrayList<>();
 

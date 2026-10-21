@@ -1,12 +1,23 @@
 package nl.novi.eindopdracht.mappers;
 
+import nl.novi.eindopdracht.dtos.task.TaskResponseDto;
+import nl.novi.eindopdracht.entities.TaskEntity;
 import org.springframework.stereotype.Component;
 import nl.novi.eindopdracht.dtos.schedule.ScheduleRequestDto;
 import nl.novi.eindopdracht.dtos.schedule.ScheduleResponseDto;
 import nl.novi.eindopdracht.entities.ScheduleEntity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Component
 public class ScheduleMapper {
+
+    private final TaskMapper taskMapper;
+
+    public ScheduleMapper(TaskMapper taskMapper) {
+        this.taskMapper = taskMapper;
+    }
 
     public ScheduleEntity transferToEntity(ScheduleRequestDto dto) {
         ScheduleEntity entity = new ScheduleEntity();
@@ -29,8 +40,15 @@ public class ScheduleMapper {
             dto.setUserName(entity.getUser().getName());
         }
 
+        if (entity.getTasks() != null) {
+            List<TaskResponseDto> taskDtos = new ArrayList<>();
+            for (TaskEntity taskEntity : entity.getTasks()) {
+                TaskResponseDto taskDto = taskMapper.transferToDto(taskEntity);
+                taskDtos.add(taskDto);
+            }
+            dto.setTasks(taskDtos);
 
-
+        }
         return dto;
     }
 }
