@@ -29,8 +29,5 @@ public class FileEntity {
     @JoinColumn(name = "task_id")
     private TaskEntity task;
 
-    @OneToOne
-    @JoinColumn(name = "user_id")
-    private UserEntity user;
 
 }

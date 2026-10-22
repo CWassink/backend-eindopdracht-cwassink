@@ -28,7 +28,8 @@ public class ScheduleEntity {
     @JoinColumn(name = "user_id",nullable = false)
     private UserEntity user;
 
-    @OneToMany(mappedBy = "schedule")
+    @OrderBy("dayPart, sortOrder")
+    @OneToMany(mappedBy = "schedule",cascade = CascadeType.ALL)
     private List<TaskEntity> tasks = new ArrayList<>();
 
 
