@@ -3,6 +3,7 @@ package nl.novi.eindopdracht.controllers;
 import jakarta.validation.Valid;
 import nl.novi.eindopdracht.dtos.task.TaskRequestDto;
 import nl.novi.eindopdracht.dtos.task.TaskResponseDto;
+import nl.novi.eindopdracht.services.ProgressService;
 import nl.novi.eindopdracht.services.TaskService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,11 +15,12 @@ import org.springframework.web.bind.annotation.*;
 public class TaskController {
 
     private final TaskService taskService;
+    private final ProgressService progressService;
 
 
-    public TaskController(TaskService taskService) {
+    public TaskController(TaskService taskService, ProgressService progressService) {
         this.taskService = taskService;
-
+        this.progressService = progressService;
     }
 
     @PostMapping
@@ -46,6 +48,12 @@ public class TaskController {
         taskService.deleteTask(id);
 
         return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{id}/finish")
+    public ResponseEntity<TaskResponseDto> finishTask(@PathVariable Long id) {
+        TaskResponseDto task = progressService.finishTask(id);
+        return ResponseEntity.ok(task);
     }
 
 
