@@ -5,6 +5,7 @@ import nl.novi.eindopdracht.dtos.task.TaskRequestDto;
 import nl.novi.eindopdracht.dtos.task.TaskResponseDto;
 import nl.novi.eindopdracht.entities.SubtaskEntity;
 import nl.novi.eindopdracht.entities.TaskEntity;
+import nl.novi.eindopdracht.enums.ProgressStatus;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -55,6 +56,31 @@ public class TaskMapper {
             dto.setSubtasks(subtaskDtos);
         }
 
+        dto.setPercentComplete(calculatePercentComplete(entity, dto.getStatus()));
+
         return dto;
+    }
+    private int calculatePercentComplete(TaskEntity entity, ProgressStatus status) {
+        int totalSubtasks = entity.getSubtasks() != null ? entity.getSubtasks().size() : 0;
+        int completedSubtasks = 0;
+
+        if (entity.getSubtasks() != null) {
+            for (SubtaskEntity subtask : entity.getSubtasks()) {
+                if (subtask.isCompleted()) {
+                    completedSubtasks++;
+                }
+            }
+        }
+
+        int percentComplete = 0;
+        if (totalSubtasks > 0) {
+            percentComplete = (completedSubtasks * 100) / totalSubtasks;
+        } else {
+            if (status == ProgressStatus.AFGEROND) {
+                percentComplete = 100;
+            }
+        }
+
+        return percentComplete;
     }
 }
