@@ -41,4 +41,10 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Ongeldige invoer. Controleer of alle velden kloppen, bijvoorbeeld dayPart: OCHTEND, MIDDAG, AVOND, en datum als JJJJ-MM-DD");
     }
 
+    @ExceptionHandler(TaskNotCompletedException.class)
+    public ResponseEntity<String> handleTaskNotCompletedException(TaskNotCompletedException ex) {
+       return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
+    }
+
+
 }
