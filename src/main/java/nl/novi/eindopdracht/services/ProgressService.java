@@ -7,6 +7,7 @@ import nl.novi.eindopdracht.enums.ProgressStatus;
 import nl.novi.eindopdracht.exceptions.RecordNotFoundException;
 import nl.novi.eindopdracht.exceptions.TaskNotCompletedException;
 import nl.novi.eindopdracht.mappers.TaskMapper;
+import nl.novi.eindopdracht.repositories.ProgressRepository;
 import nl.novi.eindopdracht.repositories.SubtaskRepository;
 import nl.novi.eindopdracht.repositories.TaskRepository;
 import org.springframework.stereotype.Service;
@@ -19,10 +20,11 @@ public class ProgressService {
     private final TaskRepository taskRepository;
     private final TaskMapper taskMapper;
 
-    public ProgressService(SubtaskRepository subtaskRepository, TaskRepository taskRepository, TaskMapper taskMapper) {
+    public ProgressService(SubtaskRepository subtaskRepository, TaskRepository taskRepository, TaskMapper taskMapper, ProgressRepository progressRepository) {
         this.subtaskRepository = subtaskRepository;
         this.taskRepository = taskRepository;
         this.taskMapper = taskMapper;
+
     }
 
     @Transactional
@@ -74,7 +76,7 @@ public class ProgressService {
     }
 
 
-    private void recalculateStatus(TaskEntity task) {
+    public void recalculateStatus(TaskEntity task) {
         int completedCount = 0;
 
         for (SubtaskEntity subtask : task.getSubtasks()) {
