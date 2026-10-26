@@ -4,11 +4,13 @@ import nl.novi.eindopdracht.dtos.subtask.SubtaskRequestDto;
 import nl.novi.eindopdracht.dtos.subtask.SubtaskResponseDto;
 import nl.novi.eindopdracht.entities.SubtaskEntity;
 import nl.novi.eindopdracht.entities.TaskEntity;
+import nl.novi.eindopdracht.entities.UserEntity;
 import nl.novi.eindopdracht.enums.ProgressStatus;
 import nl.novi.eindopdracht.exceptions.RecordNotFoundException;
 import nl.novi.eindopdracht.mappers.SubtaskMapper;
 import nl.novi.eindopdracht.repositories.SubtaskRepository;
 import nl.novi.eindopdracht.repositories.TaskRepository;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,18 +23,24 @@ public class SubtaskService {
     private final TaskRepository taskRepository;
     private final SubtaskMapper subtaskMapper;
     private final ProgressService progressService;
+    private final UserService userService;
+    private final AccessService accessService;
 
-    public SubtaskService(SubtaskRepository subtaskRepository, TaskRepository taskRepository, SubtaskMapper subtaskMapper, ProgressService progressService) {
+    public SubtaskService(SubtaskRepository subtaskRepository, TaskRepository taskRepository, SubtaskMapper subtaskMapper, ProgressService progressService, UserService userService, AccessService accessService) {
         this.subtaskRepository = subtaskRepository;
         this.taskRepository = taskRepository;
         this.subtaskMapper = subtaskMapper;
         this.progressService = progressService;
+        this.userService = userService;
+        this.accessService = accessService;
     }
 
     @Transactional
-    public SubtaskResponseDto createSubtask(SubtaskRequestDto subtaskRequestDto) {
+    public SubtaskResponseDto createSubtask(SubtaskRequestDto subtaskRequestDto, Authentication authentication) {
         TaskEntity task = taskRepository.findById(subtaskRequestDto.getTaskId())
                 .orElseThrow(() -> new RecordNotFoundException("Taak met id " + subtaskRequestDto.getTaskId() + " niet gevonden."));
+        UserEntity currentUser = userService.getCurrentUser(authentication);
+        accessService.checkScheduleAccess(currentUser, task.getSchedule());
 
         SubtaskEntity subtask = subtaskMapper.transferToEntity(subtaskRequestDto);
         subtask.setTask(task);
@@ -46,16 +54,21 @@ public class SubtaskService {
         return subtaskMapper.transferToDto(subtaskRepository.save(subtask));
     }
 
-    public SubtaskResponseDto getSubtaskById(Long subtaskId) {
+    public SubtaskResponseDto getSubtaskById(Long subtaskId, Authentication authentication) {
         SubtaskEntity subtask = subtaskRepository.findById(subtaskId)
                 .orElseThrow(() -> new RecordNotFoundException("Subtaak met id " + subtaskId + " niet gevonden."));
+
+        UserEntity currentUser = userService.getCurrentUser(authentication);
+        accessService.checkScheduleAccess(currentUser, subtask.getTask().getSchedule());
 
         return subtaskMapper.transferToDto(subtask);
     }
 
-    public SubtaskResponseDto updateSubtask(Long subtaskId, SubtaskRequestDto subtaskRequestDto) {
+    public SubtaskResponseDto updateSubtask(Long subtaskId, SubtaskRequestDto subtaskRequestDto,Authentication authentication) {
         SubtaskEntity subtask = subtaskRepository.findById(subtaskId)
                 .orElseThrow(() -> new RecordNotFoundException("Subtaak met id " + subtaskId + " niet gevonden."));
+        UserEntity currentUser = userService.getCurrentUser(authentication);
+        accessService.checkScheduleAccess(currentUser, subtask.getTask().getSchedule());
 
         subtask.setTitle(subtaskRequestDto.getTitle());
 
@@ -64,9 +77,11 @@ public class SubtaskService {
     }
 
     @Transactional
-    public void deleteSubtask(Long subtaskId) {
+    public void deleteSubtask(Long subtaskId, Authentication authentication) {
         SubtaskEntity subtask = subtaskRepository.findById(subtaskId)
                 .orElseThrow(() -> new RecordNotFoundException("Subtaak met id " + subtaskId + " niet gevonden."));
+        UserEntity currentUser = userService.getCurrentUser(authentication);
+        accessService.checkScheduleAccess(currentUser, subtask.getTask().getSchedule());
 
         TaskEntity task = subtask.getTask();
 

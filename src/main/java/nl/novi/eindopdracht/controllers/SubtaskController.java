@@ -8,6 +8,7 @@ import nl.novi.eindopdracht.services.ProgressService;
 import nl.novi.eindopdracht.services.SubtaskService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -24,27 +25,27 @@ public class SubtaskController {
     }
 
     @PostMapping
-    public ResponseEntity<SubtaskResponseDto> createSubtask(@Valid @RequestBody SubtaskRequestDto subtaskRequestDto) {
-       SubtaskResponseDto newSubtask = subtaskService.createSubtask(subtaskRequestDto);
+    public ResponseEntity<SubtaskResponseDto> createSubtask(@Valid @RequestBody SubtaskRequestDto subtaskRequestDto, Authentication authentication) {
+       SubtaskResponseDto newSubtask = subtaskService.createSubtask(subtaskRequestDto, authentication);
        return ResponseEntity.status(HttpStatus.CREATED).body(newSubtask);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<SubtaskResponseDto> getSubtask(@PathVariable Long id) {
-        SubtaskResponseDto subtask = subtaskService.getSubtaskById(id);
+    public ResponseEntity<SubtaskResponseDto> getSubtask(@PathVariable Long id, Authentication authentication) {
+        SubtaskResponseDto subtask = subtaskService.getSubtaskById(id, authentication);
 
         return ResponseEntity.ok(subtask);
     }
     @PutMapping("/{id}")
-    public ResponseEntity<SubtaskResponseDto>  updateSubtask(@PathVariable Long id,@Valid @RequestBody SubtaskRequestDto subtaskRequestDto) {
-        SubtaskResponseDto updateSubtask = subtaskService.updateSubtask(id, subtaskRequestDto);
+    public ResponseEntity<SubtaskResponseDto>  updateSubtask(@PathVariable Long id,@Valid @RequestBody SubtaskRequestDto subtaskRequestDto, Authentication authentication) {
+        SubtaskResponseDto updateSubtask = subtaskService.updateSubtask(id, subtaskRequestDto, authentication);
 
         return ResponseEntity.ok(updateSubtask);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteSubtask(@PathVariable Long id) {
-        subtaskService.deleteSubtask(id);
+    public ResponseEntity<Void> deleteSubtask(@PathVariable Long id, Authentication authentication) {
+        subtaskService.deleteSubtask(id, authentication);
 
         return ResponseEntity.noContent().build();
     }
