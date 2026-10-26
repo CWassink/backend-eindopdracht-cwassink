@@ -6,6 +6,7 @@ import nl.novi.eindopdracht.dtos.schedule.ScheduleResponseDto;
 import nl.novi.eindopdracht.services.ScheduleService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -35,8 +36,8 @@ public class ScheduleController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ScheduleResponseDto> getSchedule(@PathVariable Long id) {
-        ScheduleResponseDto schedule = scheduleService.getScheduleById(id);
+    public ResponseEntity<ScheduleResponseDto> getSchedule(@PathVariable Long id, Authentication authentication) {
+        ScheduleResponseDto schedule = scheduleService.getScheduleById(id, authentication);
 
         return ResponseEntity.ok(schedule);
     }

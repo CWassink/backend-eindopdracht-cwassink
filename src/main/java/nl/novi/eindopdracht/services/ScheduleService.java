@@ -8,6 +8,7 @@ import nl.novi.eindopdracht.exceptions.RecordNotFoundException;
 import nl.novi.eindopdracht.mappers.ScheduleMapper;
 import nl.novi.eindopdracht.repositories.ScheduleRepository;
 import nl.novi.eindopdracht.repositories.UserRepository;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -19,11 +20,15 @@ public class ScheduleService {
     private final ScheduleRepository scheduleRepository;
     private final UserRepository userRepository;
     private final ScheduleMapper scheduleMapper;
+    private final AccessService accessService;
+    private final UserService userService;
 
-    public ScheduleService(ScheduleRepository scheduleRepository, UserRepository userRepository, ScheduleMapper scheduleMapper) {
+    public ScheduleService(ScheduleRepository scheduleRepository, UserRepository userRepository, ScheduleMapper scheduleMapper, AccessService accessService, UserService userService) {
         this.scheduleRepository = scheduleRepository;
         this.userRepository = userRepository;
         this.scheduleMapper = scheduleMapper;
+        this.accessService = accessService;
+        this.userService = userService;
     }
 
     public ScheduleResponseDto createSchedule(ScheduleRequestDto scheduleRequestDto) {
@@ -50,9 +55,11 @@ public class ScheduleService {
 
     }
 
-    public ScheduleResponseDto getScheduleById(Long id) {
+    public ScheduleResponseDto getScheduleById(Long id, Authentication authentication) {
         ScheduleEntity schedule = scheduleRepository.findById(id)
-                .orElseThrow(() -> new RecordNotFoundException("Schema met id" + id + " niet gevonden."));
+                .orElseThrow(() -> new RecordNotFoundException("Schema met id " + id + " niet gevonden."));
+        UserEntity currentUser = userService.getCurrentUser(authentication);
+        accessService.checkScheduleAccess(currentUser, schedule);
 
         return scheduleMapper.transferToDto(schedule);
     }
