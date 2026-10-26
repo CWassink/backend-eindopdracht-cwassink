@@ -11,7 +11,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
+@Transactional
 @Service
 public class UserService {
     private final UserRepository userRepository;
@@ -19,9 +19,10 @@ public class UserService {
 
     public UserService(UserRepository userRepository, UserMapper userMapper) {
         this.userRepository = userRepository;
-        this.userMapper = new UserMapper();
+        this.userMapper = userMapper;
     }
 
+    @Transactional
     public UserEntity getCurrentUser(Authentication authentication) {
         String username = authentication.getName();
 
@@ -46,7 +47,7 @@ public class UserService {
 
     }
 
-    @Transactional(readOnly = true)
+    @Transactional()
     public UserResponseDto getCurrentUserDto(Authentication authentication) {
         UserEntity userEntity = getCurrentUser(authentication);
 

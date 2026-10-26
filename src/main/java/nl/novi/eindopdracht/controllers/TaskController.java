@@ -7,6 +7,8 @@ import nl.novi.eindopdracht.services.ProgressService;
 import nl.novi.eindopdracht.services.TaskService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.DefaultAuthenticationEventPublisher;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -16,43 +18,45 @@ public class TaskController {
 
     private final TaskService taskService;
     private final ProgressService progressService;
+    private final DefaultAuthenticationEventPublisher authenticationEventPublisher;
 
 
-    public TaskController(TaskService taskService, ProgressService progressService) {
+    public TaskController(TaskService taskService, ProgressService progressService, DefaultAuthenticationEventPublisher authenticationEventPublisher) {
         this.taskService = taskService;
         this.progressService = progressService;
+        this.authenticationEventPublisher = authenticationEventPublisher;
     }
 
     @PostMapping
-    public ResponseEntity<TaskResponseDto> createTask(@Valid @RequestBody TaskRequestDto taskRequestDto) {
-        TaskResponseDto newTask = taskService.createTask(taskRequestDto);
+    public ResponseEntity<TaskResponseDto> createTask(@Valid @RequestBody TaskRequestDto taskRequestDto, Authentication authentication) {
+        TaskResponseDto newTask = taskService.createTask(taskRequestDto, authentication);
         return ResponseEntity.status(HttpStatus.CREATED).body(newTask);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<TaskResponseDto> getTask(@PathVariable Long id) {
-        TaskResponseDto task = taskService.getTaskById(id);
+    public ResponseEntity<TaskResponseDto> getTask(@PathVariable Long id, Authentication authentication) {
+        TaskResponseDto task = taskService.getTaskById(id, authentication);
 
         return ResponseEntity.ok(task);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<TaskResponseDto> updateTask(@PathVariable Long id, @Valid @RequestBody TaskRequestDto taskRequestDto) {
-        TaskResponseDto updateTask = taskService.updateTask(id, taskRequestDto);
+    public ResponseEntity<TaskResponseDto> updateTask(@PathVariable Long id, @Valid @RequestBody TaskRequestDto taskRequestDto, Authentication authentication) {
+        TaskResponseDto updateTask = taskService.updateTask(id, taskRequestDto, authentication);
 
         return ResponseEntity.ok(updateTask);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteTask(@PathVariable Long id) {
-        taskService.deleteTask(id);
+    public ResponseEntity<Void> deleteTask(@PathVariable Long id, Authentication authentication) {
+        taskService.deleteTask(id, authentication);
 
         return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/{id}/finish")
-    public ResponseEntity<TaskResponseDto> finishTask(@PathVariable Long id) {
-        TaskResponseDto task = progressService.finishTask(id);
+    public ResponseEntity<TaskResponseDto> finishTask(@PathVariable Long id, Authentication authentication) {
+        TaskResponseDto task = progressService.finishTask(id, authentication);
         return ResponseEntity.ok(task);
     }
 

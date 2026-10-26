@@ -8,6 +8,7 @@ import nl.novi.eindopdracht.exceptions.RecordNotFoundException;
 import nl.novi.eindopdracht.mappers.ScheduleMapper;
 import nl.novi.eindopdracht.repositories.ScheduleRepository;
 import nl.novi.eindopdracht.repositories.UserRepository;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -19,16 +20,22 @@ public class ScheduleService {
     private final ScheduleRepository scheduleRepository;
     private final UserRepository userRepository;
     private final ScheduleMapper scheduleMapper;
+    private final AccessService accessService;
+    private final UserService userService;
 
-    public ScheduleService(ScheduleRepository scheduleRepository, UserRepository userRepository, ScheduleMapper scheduleMapper) {
+    public ScheduleService(ScheduleRepository scheduleRepository, UserRepository userRepository, ScheduleMapper scheduleMapper, AccessService accessService, UserService userService) {
         this.scheduleRepository = scheduleRepository;
         this.userRepository = userRepository;
         this.scheduleMapper = scheduleMapper;
+        this.accessService = accessService;
+        this.userService = userService;
     }
 
-    public ScheduleResponseDto createSchedule(ScheduleRequestDto scheduleRequestDto) {
+    public ScheduleResponseDto createSchedule(ScheduleRequestDto scheduleRequestDto, Authentication authentication) {
         UserEntity user = userRepository.findById(scheduleRequestDto.getUserId())
                 .orElseThrow(() -> new RecordNotFoundException("Gebruiker met id " + scheduleRequestDto.getUserId() + " niet gevonden."));
+        UserEntity currentUser = userService.getCurrentUser(authentication);
+        accessService.checkClientAccess(currentUser, user);
 
         ScheduleEntity schedule = scheduleMapper.transferToEntity(scheduleRequestDto);
         schedule.setUser(user);
@@ -39,8 +46,10 @@ public class ScheduleService {
 
     }
 
-    public List<ScheduleResponseDto> getAllSchedules() {
-        List<ScheduleEntity> schedules = scheduleRepository.findAll();
+    public List<ScheduleResponseDto> getAllSchedules(Authentication authentication) {
+        UserEntity currentUser = userService.getCurrentUser(authentication);
+
+        List<ScheduleEntity> schedules = scheduleRepository.findByUserCaregiverId(currentUser.getId());
         List<ScheduleResponseDto> scheduleResponseDtos = new ArrayList<>();
 
         for (ScheduleEntity schedule : schedules) {
@@ -50,16 +59,21 @@ public class ScheduleService {
 
     }
 
-    public ScheduleResponseDto getScheduleById(Long id) {
+    public ScheduleResponseDto getScheduleById(Long id, Authentication authentication) {
         ScheduleEntity schedule = scheduleRepository.findById(id)
-                .orElseThrow(() -> new RecordNotFoundException("Schema met id" + id + " niet gevonden."));
+                .orElseThrow(() -> new RecordNotFoundException("Schema met id " + id + " niet gevonden."));
+        UserEntity currentUser = userService.getCurrentUser(authentication);
+        accessService.checkScheduleAccess(currentUser, schedule);
 
         return scheduleMapper.transferToDto(schedule);
     }
 
-    public ScheduleResponseDto updateSchedule(Long id, ScheduleRequestDto scheduleRequestDto) {
+    public ScheduleResponseDto updateSchedule(Long id, ScheduleRequestDto scheduleRequestDto, Authentication authentication) {
         ScheduleEntity schedule = scheduleRepository.findById(id)
-                .orElseThrow(() -> new RecordNotFoundException("Schema met id" + id + " niet gevonden."));
+                .orElseThrow(() -> new RecordNotFoundException("Schema met id " + id + " niet gevonden."));
+        UserEntity currentUser = userService.getCurrentUser(authentication);
+        accessService.checkScheduleAccess(currentUser, schedule);
+
         schedule.setName(scheduleRequestDto.getName());
         schedule.setDate(scheduleRequestDto.getDate());
 
@@ -69,11 +83,13 @@ public class ScheduleService {
     }
 
 
-    public void deleteSchedule(Long id) {
+    public void deleteSchedule(Long id, Authentication authentication) {
+        ScheduleEntity schedule = scheduleRepository.findById(id)
+                .orElseThrow(() -> new RecordNotFoundException("Schema met id " + id + " niet gevonden."));
 
-        if (!scheduleRepository.existsById(id)) {
-            throw new RecordNotFoundException("Schema met id " + id + " niet gevonden.");
-        }
+        UserEntity currentUser = userService.getCurrentUser(authentication);
+        accessService.checkScheduleAccess(currentUser, schedule);
+
 
         scheduleRepository.deleteById(id);
     }

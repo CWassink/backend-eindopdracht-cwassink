@@ -46,5 +46,8 @@ public class GlobalExceptionHandler {
        return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
     }
 
-
+    @ExceptionHandler(NoAccessException.class)
+    public ResponseEntity<String> handleNoAccessException(NoAccessException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
+    }
 }

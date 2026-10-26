@@ -44,6 +44,7 @@ public class SecurityConfig {
                 })
                 .oauth2ResourceServer(oath2 -> oath2.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()).decoder(jwtDecoder())))
                 .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/error").permitAll()
                         .requestMatchers(HttpMethod.POST, "/schedules").hasAuthority("CAREGIVER")
                         .requestMatchers(HttpMethod.GET, "/schedules").hasAuthority("CAREGIVER")
                         .requestMatchers(HttpMethod.PUT, "/schedules/{id}").hasAuthority("CAREGIVER")
