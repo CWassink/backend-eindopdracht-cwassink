@@ -1,13 +1,14 @@
 package nl.novi.eindopdracht.controllers;
 
+import jakarta.validation.Valid;
+import nl.novi.eindopdracht.dtos.user.ClientRequestDto;
 import nl.novi.eindopdracht.dtos.user.UserResponseDto;
 import nl.novi.eindopdracht.mappers.UserMapper;
 import nl.novi.eindopdracht.services.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
 
 
 @RestController
@@ -28,8 +29,13 @@ public class UserController {
 
         return ResponseEntity.ok(responseDto);
 
+    }
 
-}
+@PostMapping("/clients")
+    public ResponseEntity<UserResponseDto> linkClient(@Valid @RequestBody ClientRequestDto clientRequestDto, Authentication authentication){
+        UserResponseDto responseDto = userService.linkClient(clientRequestDto.getUsername(),authentication);
 
+        return ResponseEntity.ok(responseDto);
+    }
 
 }

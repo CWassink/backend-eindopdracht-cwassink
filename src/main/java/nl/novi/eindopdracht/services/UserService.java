@@ -4,6 +4,9 @@ package nl.novi.eindopdracht.services;
 import nl.novi.eindopdracht.dtos.user.UserResponseDto;
 import nl.novi.eindopdracht.entities.UserEntity;
 import nl.novi.eindopdracht.enums.Role;
+import nl.novi.eindopdracht.exceptions.ClientAlreadyAssignedException;
+import nl.novi.eindopdracht.exceptions.NoAccessException;
+import nl.novi.eindopdracht.exceptions.RecordNotFoundException;
 import nl.novi.eindopdracht.mappers.UserMapper;
 import nl.novi.eindopdracht.repositories.UserRepository;
 import org.springframework.security.core.Authentication;
@@ -22,7 +25,7 @@ public class UserService {
         this.userMapper = userMapper;
     }
 
-    @Transactional
+
     public UserEntity getCurrentUser(Authentication authentication) {
         String username = authentication.getName();
 
@@ -47,7 +50,7 @@ public class UserService {
 
     }
 
-    @Transactional()
+
     public UserResponseDto getCurrentUserDto(Authentication authentication) {
         UserEntity userEntity = getCurrentUser(authentication);
 
@@ -55,5 +58,25 @@ public class UserService {
 
     }
 
-}
+
+    public UserResponseDto linkClient(String username, Authentication authentication) {
+        UserEntity caregiver = getCurrentUser(authentication);
+        UserEntity client = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RecordNotFoundException("Cliënt met gebruikersnaam " + username + " niet gevonden."));
+
+        if (!Role.CLIENT.equals(client.getRole())) {
+        throw new NoAccessException("Toegang geweigerd: De geselecteerde gebruiker is geen cliënt.");
+        }
+
+        if (client.getCaregiver() != null) {
+            throw new ClientAlreadyAssignedException("Conflict: Deze cliënt is al gekoppeld aan een andere zorgverlener.");
+        }
+        client.setCaregiver(caregiver);
+        UserEntity savedClient = userRepository.save(client);
+
+        return userMapper.transferToDto(savedClient);
+    }
+
+
+    }
 
