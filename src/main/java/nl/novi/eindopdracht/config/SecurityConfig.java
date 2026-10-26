@@ -85,8 +85,10 @@ public class SecurityConfig {
                 for (String authority : getAuthorities(source)) {
                     grantedAuthorities.add(new SimpleGrantedAuthority( authority));
                 }
+
                 return grantedAuthorities;
             }
+
             private List<String> getAuthorities(Jwt jwt){
                 Map<String, Object> resourceAcces = jwt.getClaim("resource_access");
                 if(resourceAcces != null){
@@ -100,6 +102,9 @@ public class SecurityConfig {
                 return new ArrayList<>();
             }
         });
+
+        jwtAuthenticationConverter.setPrincipalClaimName("preferred_username");
+
         return jwtAuthenticationConverter;
     }
 
