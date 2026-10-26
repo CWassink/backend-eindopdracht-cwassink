@@ -32,4 +32,16 @@ public class AccessService {
         }
 
     }
-}
+    public void checkClientAccess(UserEntity currentUser, UserEntity client) {
+        if (currentUser == null || client == null) {
+            throw new NoAccessException("Toegang geweigerd: Ongeldige gebruikersgegevens.");
+        }
+        if (!Role.CLIENT.equals(client.getRole())) {
+            throw new NoAccessException("Toegang geweigerd: De doelgebruiker is geen cliënt.");
+        }
+        if (client.getCaregiver() == null || !client.getCaregiver().getId().equals(currentUser.getId())) {
+            throw new NoAccessException("Toegang geweigerd: Deze cliënt is niet aan jou gekoppeld.");
+        }
+    }
+
+    }

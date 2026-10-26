@@ -3,13 +3,14 @@ package nl.novi.eindopdracht.services;
 import nl.novi.eindopdracht.dtos.task.TaskResponseDto;
 import nl.novi.eindopdracht.entities.SubtaskEntity;
 import nl.novi.eindopdracht.entities.TaskEntity;
+import nl.novi.eindopdracht.entities.UserEntity;
 import nl.novi.eindopdracht.enums.ProgressStatus;
 import nl.novi.eindopdracht.exceptions.RecordNotFoundException;
 import nl.novi.eindopdracht.exceptions.TaskNotCompletedException;
 import nl.novi.eindopdracht.mappers.TaskMapper;
-import nl.novi.eindopdracht.repositories.ProgressRepository;
 import nl.novi.eindopdracht.repositories.SubtaskRepository;
 import nl.novi.eindopdracht.repositories.TaskRepository;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,18 +20,24 @@ public class ProgressService {
     private final SubtaskRepository subtaskRepository;
     private final TaskRepository taskRepository;
     private final TaskMapper taskMapper;
+    private final UserService userService;
+    private final AccessService accessService;
 
-    public ProgressService(SubtaskRepository subtaskRepository, TaskRepository taskRepository, TaskMapper taskMapper, ProgressRepository progressRepository) {
+    public ProgressService(SubtaskRepository subtaskRepository, TaskRepository taskRepository, TaskMapper taskMapper, UserService userService, AccessService accessService) {
         this.subtaskRepository = subtaskRepository;
         this.taskRepository = taskRepository;
         this.taskMapper = taskMapper;
-
+        this.userService = userService;
+        this.accessService = accessService;
     }
 
     @Transactional
-    public TaskResponseDto checkSubtask(Long subtaskId) {
+    public TaskResponseDto checkSubtask(Long subtaskId,  Authentication authentication) {
         SubtaskEntity subtask = subtaskRepository.findById(subtaskId)
                 .orElseThrow(() -> new RecordNotFoundException("Subtaak met id " + subtaskId + " niet gevonden."));
+
+        UserEntity currentUser = userService.getCurrentUser(authentication);
+        accessService.checkScheduleAccess(currentUser,subtask.getTask().getSchedule());
 
         subtask.setCompleted(true);
 
@@ -43,9 +50,12 @@ public class ProgressService {
     }
 
     @Transactional
-    public TaskResponseDto uncheckSubtask(Long subtaskId) {
+    public TaskResponseDto uncheckSubtask(Long subtaskId, Authentication authentication) {
         SubtaskEntity subtask = subtaskRepository.findById(subtaskId)
                 .orElseThrow(() -> new RecordNotFoundException("Subtaak met id " + subtaskId + " niet gevonden."));
+
+        UserEntity currentUser = userService.getCurrentUser(authentication);
+        accessService.checkScheduleAccess(currentUser,subtask.getTask().getSchedule());
 
         subtask.setCompleted(false);
 
@@ -59,9 +69,12 @@ public class ProgressService {
     }
 
     @Transactional
-    public TaskResponseDto finishTask(Long taskId) {
+    public TaskResponseDto finishTask(Long taskId,  Authentication authentication) {
         TaskEntity task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new RecordNotFoundException("Taak met id " + taskId + " niet gevonden."));
+
+        UserEntity currentUser = userService.getCurrentUser(authentication);
+        accessService.checkScheduleAccess(currentUser, task.getSchedule());
 
         for (SubtaskEntity subtask : task.getSubtasks()) {
             if (!subtask.isCompleted()) {

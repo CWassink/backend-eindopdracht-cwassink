@@ -22,14 +22,14 @@ public class ScheduleController {
     }
 
     @PostMapping
-    public ResponseEntity<ScheduleResponseDto> createSchedule(@Valid @RequestBody ScheduleRequestDto scheduleRequestDto) {
-        ScheduleResponseDto newSchedule = scheduleService.createSchedule(scheduleRequestDto);
+    public ResponseEntity<ScheduleResponseDto> createSchedule(@Valid @RequestBody ScheduleRequestDto scheduleRequestDto, Authentication authentication) {
+        ScheduleResponseDto newSchedule = scheduleService.createSchedule(scheduleRequestDto, authentication);
         return ResponseEntity.status(HttpStatus.CREATED).body(newSchedule);
     }
 
     @GetMapping
-    public ResponseEntity<List<ScheduleResponseDto>> getAllSchedules() {
-        List<ScheduleResponseDto> schedules = scheduleService.getAllSchedules();
+    public ResponseEntity<List<ScheduleResponseDto>> getAllSchedules(Authentication authentication) {
+        List<ScheduleResponseDto> schedules = scheduleService.getAllSchedules(authentication);
 
         return ResponseEntity.ok(schedules);
 
