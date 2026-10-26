@@ -2,13 +2,16 @@ package nl.novi.eindopdracht.dtos.user;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-public class UserRequestDto {
+@NoArgsConstructor
+@Getter
+@Setter
+public class ClientRequestDto {
 
     @NotBlank(message = "Username mag niet leeg zijn.")
     @Size(min = 2, max = 100, message = "De username moet uit minimaal 2 en maximaal 100 karakters bestaan")
     private String username;
-
-    private String name;
-
 }

@@ -50,4 +50,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleNoAccessException(NoAccessException ex) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
     }
+
+    @ExceptionHandler(ClientAlreadyAssignedException.class)
+    public ResponseEntity<String> handleClientAlreadyAssignedException(ClientAlreadyAssignedException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
+    }
 }
