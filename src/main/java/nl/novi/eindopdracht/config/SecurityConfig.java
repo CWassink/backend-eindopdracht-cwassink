@@ -55,6 +55,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/tasks/{id}","/subtasks/{id}").hasAuthority("CAREGIVER")
                         .requestMatchers(HttpMethod.PATCH, "/subtasks/{id}/check","/subtasks/{id}/uncheck").hasAnyAuthority("CAREGIVER","CLIENT")
                         .requestMatchers(HttpMethod.PATCH, "/tasks/{id}/finish").hasAnyAuthority("CAREGIVER","CLIENT")
+                        .requestMatchers(HttpMethod.GET, "/users/me").hasAnyAuthority("CAREGIVER", "CLIENT")
                         .anyRequest().denyAll())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .build();
