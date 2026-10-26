@@ -64,9 +64,12 @@ public class ScheduleService {
         return scheduleMapper.transferToDto(schedule);
     }
 
-    public ScheduleResponseDto updateSchedule(Long id, ScheduleRequestDto scheduleRequestDto) {
+    public ScheduleResponseDto updateSchedule(Long id, ScheduleRequestDto scheduleRequestDto, Authentication authentication) {
         ScheduleEntity schedule = scheduleRepository.findById(id)
-                .orElseThrow(() -> new RecordNotFoundException("Schema met id" + id + " niet gevonden."));
+                .orElseThrow(() -> new RecordNotFoundException("Schema met id " + id + " niet gevonden."));
+        UserEntity currentUser = userService.getCurrentUser(authentication);
+        accessService.checkScheduleAccess(currentUser, schedule);
+
         schedule.setName(scheduleRequestDto.getName());
         schedule.setDate(scheduleRequestDto.getDate());
 
@@ -76,11 +79,13 @@ public class ScheduleService {
     }
 
 
-    public void deleteSchedule(Long id) {
+    public void deleteSchedule(Long id, Authentication authentication) {
+        ScheduleEntity schedule = scheduleRepository.findById(id)
+                .orElseThrow(() -> new RecordNotFoundException("Schema met id " + id + " niet gevonden."));
 
-        if (!scheduleRepository.existsById(id)) {
-            throw new RecordNotFoundException("Schema met id " + id + " niet gevonden.");
-        }
+        UserEntity currentUser = userService.getCurrentUser(authentication);
+        accessService.checkScheduleAccess(currentUser, schedule);
+
 
         scheduleRepository.deleteById(id);
     }

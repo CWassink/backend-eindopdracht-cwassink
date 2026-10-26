@@ -43,15 +43,15 @@ public class ScheduleController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ScheduleResponseDto> updateSchedule(@PathVariable Long id, @Valid @RequestBody ScheduleRequestDto scheduleRequestDto) {
-        ScheduleResponseDto schedule = scheduleService.updateSchedule(id, scheduleRequestDto);
+    public ResponseEntity<ScheduleResponseDto> updateSchedule(@PathVariable Long id, @Valid @RequestBody ScheduleRequestDto scheduleRequestDto, Authentication authentication) {
+        ScheduleResponseDto schedule = scheduleService.updateSchedule(id, scheduleRequestDto, authentication);
 
         return ResponseEntity.ok(schedule);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteSchedule(@PathVariable Long id) {
-        scheduleService.deleteSchedule(id);
+    public ResponseEntity<Void> deleteSchedule(@PathVariable Long id,  Authentication authentication) {
+        scheduleService.deleteSchedule(id, authentication);
 
         return ResponseEntity.noContent().build();
     }

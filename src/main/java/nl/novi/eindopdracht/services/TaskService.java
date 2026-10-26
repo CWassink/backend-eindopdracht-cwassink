@@ -6,11 +6,13 @@ import nl.novi.eindopdracht.dtos.task.TaskResponseDto;
 import nl.novi.eindopdracht.entities.ProgressEntity;
 import nl.novi.eindopdracht.entities.ScheduleEntity;
 import nl.novi.eindopdracht.entities.TaskEntity;
+import nl.novi.eindopdracht.entities.UserEntity;
 import nl.novi.eindopdracht.enums.DayPart;
 import nl.novi.eindopdracht.exceptions.RecordNotFoundException;
 import nl.novi.eindopdracht.mappers.TaskMapper;
 import nl.novi.eindopdracht.repositories.ScheduleRepository;
 import nl.novi.eindopdracht.repositories.TaskRepository;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -20,16 +22,24 @@ public class TaskService {
     private final TaskRepository taskRepository;
     private final ScheduleRepository scheduleRepository;
     private final TaskMapper taskMapper;
+    private final UserService userService;
+    private final AccessService accessService;
 
-    public TaskService(TaskRepository taskRepository, ScheduleRepository scheduleRepository, TaskMapper taskMapper) {
+
+    public TaskService(TaskRepository taskRepository, ScheduleRepository scheduleRepository, TaskMapper taskMapper, UserService userService, AccessService accessService) {
         this.taskRepository = taskRepository;
         this.scheduleRepository = scheduleRepository;
         this.taskMapper = taskMapper;
+        this.userService = userService;
+        this.accessService = accessService;
     }
 
-    public TaskResponseDto createTask(TaskRequestDto taskRequestDto) {
+    public TaskResponseDto createTask(TaskRequestDto taskRequestDto, Authentication authentication) {
         ScheduleEntity schedule = scheduleRepository.findById(taskRequestDto.getScheduleId())
                 .orElseThrow(() -> new RecordNotFoundException("Schema met id " + taskRequestDto.getScheduleId() + " niet gevonden."));
+
+        UserEntity currentUser = userService.getCurrentUser(authentication);
+        accessService.checkScheduleAccess(currentUser, schedule);
 
         TaskEntity task = taskMapper.transferToEntity(taskRequestDto);
         task.setSchedule(schedule);
@@ -48,15 +58,22 @@ public class TaskService {
 
     }
 
-    public TaskResponseDto getTaskById(Long taskId) {
+    public TaskResponseDto getTaskById(Long taskId, Authentication authentication) {
         TaskEntity task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new RecordNotFoundException("Taak " + taskId + " niet gevonden."));
+
+        UserEntity currentUser = userService.getCurrentUser(authentication);
+        accessService.checkScheduleAccess(currentUser, task.getSchedule());
+
         return taskMapper.transferToDto(task);
     }
 
-    public TaskResponseDto updateTask(Long taskId, TaskRequestDto taskRequestDto) {
+    public TaskResponseDto updateTask(Long taskId, TaskRequestDto taskRequestDto, Authentication authentication) {
         TaskEntity task = taskRepository.findById(taskId)
-                .orElseThrow(() -> new RecordNotFoundException("Taak met id " + taskId + " niet gevonden."));
+                .orElseThrow(() -> new RecordNotFoundException("Taak " + taskId + " niet gevonden."));
+        UserEntity currentUser = userService.getCurrentUser(authentication);
+        accessService.checkScheduleAccess(currentUser, task.getSchedule());
+
         DayPart oldDayPart = task.getDayPart();
 
         task.setTitle(taskRequestDto.getTitle());
@@ -72,10 +89,14 @@ public class TaskService {
         return taskMapper.transferToDto(savedTask);
     }
 
-    public void deleteTask(Long taskId) {
-        if (!taskRepository.existsById(taskId)) {
-            throw new RecordNotFoundException("Taak " + taskId + " niet gevonden.");
-        }
+    public void deleteTask(Long taskId, Authentication authentication) {
+        TaskEntity task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new RecordNotFoundException("Taak " + taskId + " niet gevonden."));
+
+
+        UserEntity currentUser = userService.getCurrentUser(authentication);
+        accessService.checkScheduleAccess(currentUser, task.getSchedule());
+
         taskRepository.deleteById(taskId);
     }
 
