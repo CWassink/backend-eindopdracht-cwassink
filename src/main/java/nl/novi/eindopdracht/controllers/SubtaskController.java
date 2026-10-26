@@ -51,15 +51,15 @@ public class SubtaskController {
     }
 
     @PatchMapping("/{id}/check")
-    public ResponseEntity<TaskResponseDto> checkSubtask(@PathVariable Long id) {
-        TaskResponseDto task = progressService.checkSubtask(id);
+    public ResponseEntity<TaskResponseDto> checkSubtask(@PathVariable Long id, Authentication authentication) {
+        TaskResponseDto task = progressService.checkSubtask(id, authentication);
 
         return ResponseEntity.ok(task);
     }
 
     @PatchMapping("/{id}/uncheck")
-    public ResponseEntity<TaskResponseDto> uncheckSubtask(@PathVariable Long id) {
-        TaskResponseDto task = progressService.uncheckSubtask(id);
+    public ResponseEntity<TaskResponseDto> uncheckSubtask(@PathVariable Long id, Authentication authentication) {
+        TaskResponseDto task = progressService.uncheckSubtask(id, authentication);
 
         return ResponseEntity.ok(task);
     }

@@ -55,8 +55,8 @@ public class TaskController {
     }
 
     @PatchMapping("/{id}/finish")
-    public ResponseEntity<TaskResponseDto> finishTask(@PathVariable Long id) {
-        TaskResponseDto task = progressService.finishTask(id);
+    public ResponseEntity<TaskResponseDto> finishTask(@PathVariable Long id, Authentication authentication) {
+        TaskResponseDto task = progressService.finishTask(id, authentication);
         return ResponseEntity.ok(task);
     }
 
