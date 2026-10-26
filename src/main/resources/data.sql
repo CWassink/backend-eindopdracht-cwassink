@@ -1,6 +1,6 @@
-INSERT INTO users(username,password,name,role ) VALUES ('caregiver1', 'wachtwoord', 'Pietje', 'CAREGIVER');
-INSERT INTO users(username,password,name,role, caregiver_id ) VALUES ('client1', 'wachtwoord','Marie','CLIENT',1 );
-INSERT INTO users(username,password,name,role, caregiver_id ) VALUES ('client2', 'wachtwoord','Kees','CLIENT',1 );
+INSERT INTO users(username,name,role ) VALUES ('caregiver1', 'Pietje', 'CAREGIVER');
+INSERT INTO users(username,name,role, caregiver_id ) VALUES ('client1','Marie','CLIENT',1 );
+INSERT INTO users(username,name,role, caregiver_id ) VALUES ('client2','Kees','CLIENT',1 );
 
 INSERT INTO schedules (date, user_id, name) VALUES ('2026-10-20', 2, 'schooldag');
 INSERT INTO schedules (date, user_id, name) VALUES ('2026-10-10', 3, 'weekend');
