@@ -68,4 +68,10 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.PAYLOAD_TOO_LARGE) // Status 413
                 .body("Het bestand mag maximaal 2 MB zijn.");
     }
+
+    @ExceptionHandler(PdfGenerationException.class)
+    public ResponseEntity<String> handlePdfGenerationException(PdfGenerationException ex) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
+    }
+
 }
