@@ -7,6 +7,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.validation.FieldError;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -59,5 +60,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(InvalidFileException.class)
     public ResponseEntity<String> handleInvalidFileException(InvalidFileException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<String> handleMaxUploadSizeExceededException(MaxUploadSizeExceededException exception) {
+        return ResponseEntity
+                .status(HttpStatus.PAYLOAD_TOO_LARGE) // Status 413
+                .body("Het bestand mag maximaal 2 MB zijn.");
     }
 }

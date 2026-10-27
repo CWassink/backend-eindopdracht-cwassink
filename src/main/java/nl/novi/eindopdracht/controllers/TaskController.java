@@ -3,13 +3,16 @@ package nl.novi.eindopdracht.controllers;
 import jakarta.validation.Valid;
 import nl.novi.eindopdracht.dtos.task.TaskRequestDto;
 import nl.novi.eindopdracht.dtos.task.TaskResponseDto;
+import nl.novi.eindopdracht.services.FileService;
 import nl.novi.eindopdracht.services.ProgressService;
 import nl.novi.eindopdracht.services.TaskService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.DefaultAuthenticationEventPublisher;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 
 @RestController
@@ -18,13 +21,13 @@ public class TaskController {
 
     private final TaskService taskService;
     private final ProgressService progressService;
-    private final DefaultAuthenticationEventPublisher authenticationEventPublisher;
+    private final FileService fileService;
 
 
-    public TaskController(TaskService taskService, ProgressService progressService, DefaultAuthenticationEventPublisher authenticationEventPublisher) {
+    public TaskController(TaskService taskService, ProgressService progressService, FileService fileService) {
         this.taskService = taskService;
         this.progressService = progressService;
-        this.authenticationEventPublisher = authenticationEventPublisher;
+        this.fileService = fileService;
     }
 
     @PostMapping
@@ -60,5 +63,14 @@ public class TaskController {
         return ResponseEntity.ok(task);
     }
 
+    @PostMapping("/{id}/pictogram")
+    public ResponseEntity<Void> uploadPictogram(
+            @PathVariable Long id,
+            @RequestParam("file") MultipartFile file,
+            Authentication authentication) throws IOException {
 
+        fileService.uploadPictogram(id, file, authentication);
+
+        return ResponseEntity.noContent().build();
+    }
 }
