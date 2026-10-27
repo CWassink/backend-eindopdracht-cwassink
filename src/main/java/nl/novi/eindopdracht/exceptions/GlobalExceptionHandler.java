@@ -55,4 +55,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleClientAlreadyAssignedException(ClientAlreadyAssignedException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
     }
+
+    @ExceptionHandler(InvalidFileException.class)
+    public ResponseEntity<String> handleInvalidFileException(InvalidFileException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
 }
