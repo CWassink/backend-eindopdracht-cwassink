@@ -3,8 +3,11 @@ package nl.novi.eindopdracht.controllers;
 import jakarta.validation.Valid;
 import nl.novi.eindopdracht.dtos.schedule.ScheduleRequestDto;
 import nl.novi.eindopdracht.dtos.schedule.ScheduleResponseDto;
+import nl.novi.eindopdracht.services.PdfService;
 import nl.novi.eindopdracht.services.ScheduleService;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -16,9 +19,11 @@ import java.util.List;
 public class ScheduleController {
 
     private final ScheduleService scheduleService;
+    private final PdfService pdfService;
 
-    public ScheduleController(ScheduleService scheduleService) {
+    public ScheduleController(ScheduleService scheduleService, PdfService pdfService) {
         this.scheduleService = scheduleService;
+        this.pdfService = pdfService;
     }
 
     @PostMapping
@@ -55,7 +60,15 @@ public class ScheduleController {
 
         return ResponseEntity.noContent().build();
     }
+    @GetMapping("/{id}/pdf")
+    public ResponseEntity<byte[]> getSchedulePdf(@PathVariable Long id, Authentication authentication) {
+        byte[] pdfBytes = pdfService.createSchedulePdf(id, authentication);
 
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_PDF)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=schedule-" + id + ".pdf")
+                .body(pdfBytes);
+    }
 
 
 

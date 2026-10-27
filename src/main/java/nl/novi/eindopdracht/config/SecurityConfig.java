@@ -47,6 +47,7 @@ public class SecurityConfig {
                         .requestMatchers("/error").permitAll()
                         .requestMatchers(HttpMethod.POST, "/tasks/{id}/pictogram").hasAuthority("CAREGIVER")
                         .requestMatchers(HttpMethod.GET, "/tasks/{id}/pictogram").hasAnyAuthority("CAREGIVER", "CLIENT")
+                        .requestMatchers(HttpMethod.GET,"/schedules/{id}/pdf").hasAnyAuthority("CAREGIVER", "CLIENT")
                         .requestMatchers(HttpMethod.POST, "/schedules").hasAuthority("CAREGIVER")
                         .requestMatchers(HttpMethod.GET, "/schedules").hasAuthority("CAREGIVER")
                         .requestMatchers(HttpMethod.PUT, "/schedules/{id}").hasAuthority("CAREGIVER")
