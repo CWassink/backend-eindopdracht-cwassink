@@ -3,10 +3,13 @@ package nl.novi.eindopdracht.controllers;
 import jakarta.validation.Valid;
 import nl.novi.eindopdracht.dtos.task.TaskRequestDto;
 import nl.novi.eindopdracht.dtos.task.TaskResponseDto;
+import nl.novi.eindopdracht.entities.FileEntity;
 import nl.novi.eindopdracht.services.FileService;
 import nl.novi.eindopdracht.services.ProgressService;
 import nl.novi.eindopdracht.services.TaskService;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -72,5 +75,19 @@ public class TaskController {
         fileService.uploadPictogram(id, file, authentication);
 
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{id}/pictogram")
+    public ResponseEntity<byte[]> getPictogram(
+            @PathVariable Long id,
+            Authentication authentication) {
+
+        FileEntity fileEntity = fileService.getPictogram(id, authentication);
+        MediaType mediaType = MediaType.parseMediaType(fileEntity.getContentType());
+
+        return ResponseEntity.ok()
+                .contentType(mediaType)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=" + fileEntity.getFileName())
+                .body(fileEntity.getContents());
     }
 }

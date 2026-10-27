@@ -67,4 +67,19 @@ public class FileService {
 
         taskRepository.save(task);
     }
+
+    @Transactional
+    public FileEntity getPictogram(Long taskId, Authentication authentication) {
+        TaskEntity task = taskRepository.findById(taskId)
+                .orElseThrow(()-> new RecordNotFoundException("Taak met id " + taskId + " niet gevonden."));
+
+        UserEntity currentUser = userService.getCurrentUser(authentication);
+        accessService.checkScheduleAccess(currentUser, task.getSchedule());
+
+        FileEntity fileEntity = task.getPictogram();
+        if (fileEntity == null) {
+            throw new RecordNotFoundException("Taak met id " + taskId + " heeft geen pictogram.");
+        }
+        return fileEntity;
+    }
 }

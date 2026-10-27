@@ -46,6 +46,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/error").permitAll()
                         .requestMatchers(HttpMethod.POST, "/tasks/{id}/pictogram").hasAuthority("CAREGIVER")
+                        .requestMatchers(HttpMethod.GET, "/tasks/{id}/pictogram").hasAnyAuthority("CAREGIVER", "CLIENT")
                         .requestMatchers(HttpMethod.POST, "/schedules").hasAuthority("CAREGIVER")
                         .requestMatchers(HttpMethod.GET, "/schedules").hasAuthority("CAREGIVER")
                         .requestMatchers(HttpMethod.PUT, "/schedules/{id}").hasAuthority("CAREGIVER")
