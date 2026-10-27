@@ -45,6 +45,8 @@ public class SecurityConfig {
                 .oauth2ResourceServer(oath2 -> oath2.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()).decoder(jwtDecoder())))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/error").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/tasks/{id}/pictogram").hasAuthority("CAREGIVER")
+                        .requestMatchers(HttpMethod.GET, "/tasks/{id}/pictogram").hasAnyAuthority("CAREGIVER", "CLIENT")
                         .requestMatchers(HttpMethod.POST, "/schedules").hasAuthority("CAREGIVER")
                         .requestMatchers(HttpMethod.GET, "/schedules").hasAuthority("CAREGIVER")
                         .requestMatchers(HttpMethod.PUT, "/schedules/{id}").hasAuthority("CAREGIVER")
@@ -98,10 +100,15 @@ public class SecurityConfig {
                     if( resourceAcces.get(clientId) instanceof Map) {
                         Map<String, Object> client = (Map<String, Object>) resourceAcces.get(clientId);
                         if(client != null && client.containsKey("roles")) {
-                            return (List<String>) client.get("roles");
+                            List<String> roles = (List<String>) client.get("roles");
+                            if (roles != null && roles.contains("CLIENT")) {
+                                return List.of("CLIENT");
+                            }
+                            return roles;
+                            }
                         }
                     }
-                }
+
                 return new ArrayList<>();
             }
         });

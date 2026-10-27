@@ -19,11 +19,12 @@ public class FileEntity {
     @Column(nullable = false)
     private String fileName;
 
-    @Column(nullable = false)
-    private String fileUrl;
 
     @Column(nullable = false)
     private String contentType;
+
+    @Lob
+    private byte[] contents;
 
     @OneToOne
     @JoinColumn(name = "task_id")
