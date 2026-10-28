@@ -34,5 +34,11 @@ public class ScheduleControllerIntegrationTest {
                 .andExpect(jsonPath("$.name").value("schooldag"));
     }
 
+    @Test
+    @WithMockUser(username = "client1", authorities = "CLIENT")
+    public void getScheduleByID_shouldReturnForbidden_whenClientRequestsOtherClientsSchedule() throws Exception{
+        mockMvc.perform(get("/schedules/{id}",2L))
+                .andExpect(status().isForbidden());
+    }
 
 }
