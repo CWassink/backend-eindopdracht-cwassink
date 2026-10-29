@@ -70,16 +70,19 @@ public class SecurityConfig {
 
     @Bean
     public JwtDecoder jwtDecoder() {
-        NimbusJwtDecoder jwtDecoder = JwtDecoders.fromOidcIssuerLocation(issuerUri);
+        return new SupplierJwtDecoder(() ->{
+            NimbusJwtDecoder jwtDecoder = JwtDecoders.fromOidcIssuerLocation(issuerUri);
 
-        OAuth2TokenValidator<Jwt> audienceValidator = new JwtAudienceValidator(audience);
-        OAuth2TokenValidator<Jwt> withIssuerUri = JwtValidators.createDefaultWithIssuer(issuerUri);
-        OAuth2TokenValidator<Jwt> withAudience = new DelegatingOAuth2TokenValidator<>(withIssuerUri, audienceValidator);
+            OAuth2TokenValidator<Jwt> audienceValidator = new JwtAudienceValidator(audience);
+            OAuth2TokenValidator<Jwt> withIssuerUri = JwtValidators.createDefaultWithIssuer(issuerUri);
+            OAuth2TokenValidator<Jwt> withAudience = new DelegatingOAuth2TokenValidator<>(withIssuerUri, audienceValidator);
 
         jwtDecoder.setJwtValidator(withAudience);
         return jwtDecoder;
 
-    }
+        });
+        }
+
 
     @Bean
     public JwtAuthenticationConverter jwtAuthenticationConverter() {
