@@ -19,6 +19,8 @@ public class UserEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String keycloakId;
+
     @Column(unique = true,nullable = false)
     private String username;
 

@@ -1,6 +1,6 @@
 package nl.novi.eindopdracht.services;
 
-
+import nl.novi.eindopdracht.dtos.user.ClientRequestDto;
 import nl.novi.eindopdracht.dtos.user.UserResponseDto;
 import nl.novi.eindopdracht.entities.UserEntity;
 import nl.novi.eindopdracht.enums.Role;
@@ -19,12 +19,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final KeycloakAdminService keycloakAdminService;
 
-    public UserService(UserRepository userRepository, UserMapper userMapper) {
+    public UserService(UserRepository userRepository, UserMapper userMapper, KeycloakAdminService keycloakAdminService) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
+        this.keycloakAdminService = keycloakAdminService;
     }
-
 
     public UserEntity getCurrentUser(Authentication authentication) {
         String username = authentication.getName();
@@ -46,18 +47,12 @@ public class UserService {
 
                     return userRepository.save(newUser);
                 });
-
-
     }
-
 
     public UserResponseDto getCurrentUserDto(Authentication authentication) {
         UserEntity userEntity = getCurrentUser(authentication);
-
         return userMapper.transferToDto(userEntity);
-
     }
-
 
     public UserResponseDto linkClient(String username, Authentication authentication) {
         UserEntity caregiver = getCurrentUser(authentication);
@@ -65,7 +60,7 @@ public class UserService {
                 .orElseThrow(() -> new RecordNotFoundException("Cliënt met gebruikersnaam " + username + " niet gevonden."));
 
         if (!Role.CLIENT.equals(client.getRole())) {
-        throw new NoAccessException("Toegang geweigerd: De geselecteerde gebruiker is geen cliënt.");
+            throw new NoAccessException("Toegang geweigerd: De geselecteerde gebruiker is geen cliënt.");
         }
 
         if (client.getCaregiver() != null) {
@@ -77,6 +72,28 @@ public class UserService {
         return userMapper.transferToDto(savedClient);
     }
 
+    public UserResponseDto registerClient(ClientRequestDto request, Authentication authentication) {
 
+        UserEntity currentCaregiver = getCurrentUser(authentication);
+
+        String username = request.getUsername().toLowerCase();
+
+        String keycloakId = keycloakAdminService.registerNewUser(
+                username,
+                request.getName(),
+                request.getPassword()
+        );
+
+
+        UserEntity newClient = new UserEntity();
+        newClient.setKeycloakId(keycloakId);
+        newClient.setUsername(username);
+        newClient.setName(request.getName());
+        newClient.setRole(Role.CLIENT);
+        newClient.setCaregiver(currentCaregiver);
+
+
+        UserEntity savedClient = userRepository.save(newClient);
+        return userMapper.transferToDto(savedClient);
     }
-
+}
