@@ -14,4 +14,11 @@ public class ClientRequestDto {
     @NotBlank(message = "Username mag niet leeg zijn.")
     @Size(min = 2, max = 100, message = "De username moet uit minimaal 2 en maximaal 100 karakters bestaan")
     private String username;
+
+    @NotBlank(message = "Naam mag niet leeg zijn.")
+    private String name;
+
+    @NotBlank(message = "Wachtwoord mag niet leeg zijn.")
+    @Size(min = 6, message = "Het wachtwoord moet uit minimaal 6 karakters bestaan")
+    private String password;
 }

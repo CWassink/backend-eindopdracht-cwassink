@@ -1,5 +1,6 @@
 package nl.novi.eindopdracht.services;
 
+import nl.novi.eindopdracht.dtos.user.ClientRequestDto;
 import nl.novi.eindopdracht.dtos.user.UserResponseDto;
 import nl.novi.eindopdracht.entities.UserEntity;
 import nl.novi.eindopdracht.enums.Role;
@@ -34,6 +35,9 @@ class UserServiceTest {
 
     @Mock
     private Authentication authentication;
+
+    @Mock
+    private KeycloakAdminService keycloakAdminService;
 
     @InjectMocks
     private UserService userService;
@@ -194,6 +198,48 @@ class UserServiceTest {
 
         // Act & Assert
         assertThrows(ClientAlreadyAssignedException.class, () -> userService.linkClient("client1", authentication));
+    }
+
+    @Test
+    void registerClient_shouldCreateClientInKeycloakAndDatabase_whenDataIsValid() {
+        // Arrange
+        when(authentication.getName()).thenReturn("caregiverUser");
+
+        UserEntity caregiver = new UserEntity();
+        caregiver.setId(1L);
+        caregiver.setUsername("caregiverUser");
+        caregiver.setRole(Role.CAREGIVER);
+
+        when(userRepository.findByUsername("caregiverUser")).thenReturn(Optional.of(caregiver));
+
+        ClientRequestDto requestDto = new ClientRequestDto();
+        requestDto.setUsername("Sem");
+        requestDto.setName("Sem de Vries");
+        requestDto.setPassword("Wachtwoord123!");
+
+        String expectedKeycloakId = "keycloak-id-123";
+        when(keycloakAdminService.registerNewUser("sem", "Sem de Vries", "Wachtwoord123!"))
+                .thenReturn(expectedKeycloakId);
+
+        when(userRepository.save(any(UserEntity.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        UserResponseDto expectedDto = new UserResponseDto();
+        expectedDto.setId(2L);
+        expectedDto.setUsername("sem");
+        expectedDto.setName("Sem de Vries");
+        expectedDto.setRole(Role.CLIENT);
+
+        when(userMapper.transferToDto(any(UserEntity.class))).thenReturn(expectedDto);
+
+        // Act
+        UserResponseDto result = userService.registerClient(requestDto, authentication);
+
+        // Assert
+        assertEquals(expectedDto, result);
+
+        verify(keycloakAdminService, times(1)).registerNewUser("sem", "Sem de Vries", "Wachtwoord123!");
+
+        verify(userRepository, times(1)).save(any(UserEntity.class));
     }
 
 }

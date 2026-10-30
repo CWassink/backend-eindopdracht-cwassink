@@ -61,6 +61,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PATCH, "/tasks/{id}/finish").hasAnyAuthority("CAREGIVER","CLIENT")
                         .requestMatchers(HttpMethod.GET, "/users/me").hasAnyAuthority("CAREGIVER", "CLIENT")
                         .requestMatchers(HttpMethod.POST, "/users/clients").hasAuthority("CAREGIVER")
+                        .requestMatchers(HttpMethod.POST, "/users/clients/new").hasAuthority("CAREGIVER")
                         .anyRequest().denyAll())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .build();
